@@ -8,6 +8,8 @@ on:
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: 'write'
     # strategy:
     #   matrix:
     #     node-version: [18.x, 20.x, 22.x]
