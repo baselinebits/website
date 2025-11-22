@@ -11,21 +11,13 @@ jobs:
     permissions:
       id-token: 'write'
       pages: 'write'
-    # strategy:
-    #   matrix:
-    #     node-version: [18.x, 20.x, 22.x]
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
-      # - name: Use Node.js ${{ matrix.node-version }}
-      #   uses: actions/setup-node@v6
-      #   with:
-      #     node-version: ${{ matrix.node-version }}
-      #     cache: 'npm'
-      - name: Use Node.js 22.x
+      - name: Use Node.js 24.x
         uses: actions/setup-node@v6
         with:
-          node-version: 22.x
+          node-version: 24.x
           cache: 'npm'
       - name: Install dependencies
         run: npm install
