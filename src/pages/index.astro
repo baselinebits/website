@@ -2,27 +2,175 @@
 
 ---
 
+<!doctype html>
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
 		<title>Baseline Bits</title>
 		<style>
-		body {
-			background-color: black;
-			color: white;
-			font-family: Arial, sans-serif;
-			text-align: center;
-			padding-top: 20%;
-		}
-		h1 {
-			font-size: 4rem;
-		}
+			body {
+				background-color: black;
+				color: #cccccc;
+				font-family:
+					"SF Pro Display",
+					-apple-system,
+					"system-ui",
+					"Segoe UI",
+					Roboto,
+					Oxygen,
+					Ubuntu,
+					Cantarell,
+					"Open Sans",
+					"Helvetica Neue",
+					sans-serif;
+				margin: 0;
+				padding: 0;
+			}
+
+			canvas {
+				position: fixed;
+				top: 0;
+				left: 0;
+				z-index: -1; /* behind content */
+			}
+
+			.top-left {
+				position: absolute;
+				top: 2rem;
+				left: 2rem;
+				font-size: 18px;
+				max-width: 58ch;
+				line-height: 1.4;
+			}
+
+			.bottom-left {
+				position: absolute;
+				bottom: 2rem;
+				left: 2rem;
+				font-size: 18px;
+			}
+
+			.bottom-left a {
+				color: #bbbbbb;
+				text-decoration: none;
+			}
+
+			.bottom-left a:hover {
+				color: #ffffff;
+			}
 		</style>
 	</head>
 	<body>
-		<h1>Baseline Bits</h1>
+		<canvas id="background"></canvas>
+		<div class="top-left">
+			<b>Baseline Bits</b> is a cutting-edge software studio dedicated to building
+			digital solutions from the ground up. We are the creators of <b>O</b
+			> and <b>B</b>.
+		</div>
+		<div class="bottom-left">
+			<a href="mailto:baselinebits@gmail.com">
+				<b></b>
+				Let's bring your vision to life.
+			</a>
+		</div>
+		<script>
+			const canvas = document.getElementById(
+				"background",
+			) as HTMLCanvasElement | null;
+			if (!canvas) throw new Error("Canvas element not found");
+
+			const ctx = canvas.getContext("2d")!;
+
+			let width = (canvas.width = window.innerWidth);
+			let height = (canvas.height = window.innerHeight);
+
+			const particles: Particle[] = [];
+			const numParticles = 400;
+
+			let mouse = { x: width / 2, y: height / 2 };
+
+			class Particle {
+				x: number;
+				y: number;
+				vx: number;
+				vy: number;
+				radius: number;
+
+				constructor() {
+					this.x = Math.random() * width;
+					this.y = Math.random() * height;
+					this.vx = (Math.random() - 0.5) * 2;
+					this.vy = (Math.random() - 0.5) * 2;
+					this.radius = Math.random() * 2 + 1;
+				}
+
+				update() {
+					this.x += this.vx;
+					this.y += this.vy;
+
+					if (this.x < 0 || this.x > width) this.vx *= -1;
+					if (this.y < 0 || this.y > height) this.vy *= -1;
+
+					// Circular mouse repulsion
+					const dx = this.x - mouse.x;
+					const dy = this.y - mouse.y;
+					const dist = Math.sqrt(dx * dx + dy * dy);
+					const pushRadius = 200; // Increased push radius
+					if (dist < pushRadius) {
+						const force = ((pushRadius - dist) / pushRadius) * 0.5; // Stronger near mouse
+						this.vx += (dx / dist) * force;
+						this.vy += (dy / dist) * force;
+					}
+
+					// Limit speed for stability
+					const speed = Math.sqrt(
+						this.vx * this.vx + this.vy * this.vy,
+					);
+					const maxSpeed = 3;
+					if (speed > maxSpeed) {
+						this.vx = (this.vx / speed) * maxSpeed;
+						this.vy = (this.vy / speed) * maxSpeed;
+					}
+				}
+
+				draw() {
+					ctx.beginPath();
+					ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+
+					// Generate a random light gray shade
+					const grayValue = 50 + Math.random() * 25; // 200-245
+					ctx.fillStyle = `rgb(${grayValue}, ${grayValue}, ${grayValue})`;
+
+					ctx.fill();
+				}
+			}
+
+			for (let i = 0; i < numParticles; i++) {
+				particles.push(new Particle());
+			}
+
+			function animate() {
+				ctx.clearRect(0, 0, width, height);
+				particles.forEach((p) => {
+					p.update();
+					p.draw();
+				});
+				requestAnimationFrame(animate);
+			}
+
+			animate();
+
+			window.addEventListener("resize", () => {
+				width = canvas.width = window.innerWidth;
+				height = canvas.height = window.innerHeight;
+			});
+
+			window.addEventListener("mousemove", (e) => {
+				mouse.x = e.clientX;
+				mouse.y = e.clientY;
+			});
+		</script>
 	</body>
 </html>
